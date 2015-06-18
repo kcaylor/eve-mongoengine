@@ -102,9 +102,12 @@ class MongoengineDataLayer(Mongo):
             raise ConfigException('Must set both USERNAME and PASSWORD '
                                   'or neither')
         # try to connect to db
-        self.conn = connect(ext.app.config['MONGO_DBNAME'],
-                            host=ext.app.config['MONGO_HOST'],
-                            port=ext.app.config['MONGO_PORT'])
+        if ext.app.config['MONGO_URI']:  # use MONGO_URI if available
+            self.conn = connect(ext.app.config['MONGO_URI'])
+        else:  # Or just use the usual connection settings
+            self.conn = connect(ext.app.config['MONGO_DBNAME'],
+                                host=ext.app.config['MONGO_HOST'],
+                                port=ext.app.config['MONGO_PORT'])
         self.models = ext.models
         self.app = ext.app
         # create dummy driver instead of PyMongo, which causes errors
